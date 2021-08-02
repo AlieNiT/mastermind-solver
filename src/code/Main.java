@@ -4,41 +4,51 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-    static int digitCount = 2;
+    static int digitCount = 4;
+
     public static void main(String[] args) {
         ArrayList<Integer> options = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
-        for (int i = 0; i < Math.pow(10, digitCount); i++)
-            options.add(i);
 
-        while (true) {
+        for (int i = 1111; i < 6667; i++) {
+            if (
+                Integer.toString(i).contains("7") ||
+                Integer.toString(i).contains("8") ||
+                Integer.toString(i).contains("9") ||
+                Integer.toString(i).contains("0")
+            ) continue;
+            options.add(i);
+        }
+        for (int i = 0; ; i++) {
+            if (options.size() == 1) {
+                System.out.println(options.get(0));
+                break;
+            }
             int guess = guesser(options);
-            System.out.println(guess);
+            System.out.println("guess number" + (i + 1) + ": " + "0".repeat(Math.max(0, digitCount - numOfDigits(guess))) + guess);
             int outcome = scanner.nextInt();
             options = removeOptions(options, guess, outcome);
-//            for (int option : options) {
-//                System.out.println(option);
-//            }
         }
     }
 
     public static int guesser(ArrayList<Integer> options) {
-        if (digitCount == 4 && options.size() == Math.pow(10 , digitCount))
+        if (digitCount == 4 && options.size() == 1296)
             return 1122;
-        System.out.println("////");
-        for (int option : options) {
-            System.out.println(option);
-        }
-        System.out.println("////");
         int choice = 0;
-        int tmp = 0;
-        int bestWorstOutcomeRemoval = 0;
-        for (int option : options) {
-            int worstCaseRemoval = 1000;
+        int bestWorstOutcomeRemoval = -1;
+        for (int option = 1111; option < 6667; option++) {
+            if (
+                    Integer.toString(option).contains("7") ||
+                            Integer.toString(option).contains("8") ||
+                            Integer.toString(option).contains("9") ||
+                            Integer.toString(option).contains("0")
+            ) continue;
+            int worstCaseRemoval = (int) Math.pow(10, digitCount);
             for (int i = 0; i < digitCount + 1; i++)
                 for (int j = 0; j < digitCount + 1 - i; j++)
-                    if (numOfRemoval(options, option, i * 10 + j) < worstCaseRemoval)
+                    if (numOfRemoval(options, option, i * 10 + j) < worstCaseRemoval) {
                         worstCaseRemoval = numOfRemoval(options, option, i * 10 + j);
+                    }
             if (worstCaseRemoval > bestWorstOutcomeRemoval) {
                 choice = option;
                 bestWorstOutcomeRemoval = worstCaseRemoval;
@@ -50,7 +60,7 @@ public class Main {
     public static int numOfRemoval(ArrayList<Integer> options, int guess, int outCome) {
         int staying = 0;
         for (int option : options)
-            if (outComeOf(option, guess) == outCome)
+            if (outcomeOf(option, guess) == outCome)
                 staying++;
 
         return options.size() - staying;
@@ -59,12 +69,12 @@ public class Main {
     public static ArrayList<Integer> removeOptions(ArrayList<Integer> options, int guess, int outcome) {
         ArrayList<Integer> res = new ArrayList<>();
         for (int option : options)
-            if (outComeOf(option, guess) == outcome)
+            if (outcomeOf(option, guess) == outcome)
                 res.add(option);
         return res;
     }
 
-    public static int outComeOf(int goal, int choice) {
+    public static int outcomeOf(int goal, int choice) {
         int res = 0;
         String sChoice, sGoal;
         StringBuilder sbChoice = new StringBuilder();
@@ -92,6 +102,8 @@ public class Main {
     }
 
     public static int numOfDigits(int n) {
+        if (n == 0)
+            return 1;
         int res = 0;
         while (n != 0) {
             n /= 10;
